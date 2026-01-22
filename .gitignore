@@ -1,0 +1,31 @@
+# Frontend (React)
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.cache/
+frontend/.next/
+frontend/.vite/
+
+# Backend (Flask/Python)
+backend/instance/
+backend/venv/
+backend/.env
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.log
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Testing/coverage
+coverage/
+.coverage
+
+# Misc
+.trae/
+*.local
