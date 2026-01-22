@@ -14,8 +14,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #0f172a;
-  color: #e2e8f0;
+  background:
+    radial-gradient(900px 400px at 15% 0%, rgba(255,228,230,0.5), transparent 60%),
+    radial-gradient(800px 350px at 85% 0%, rgba(254,243,199,0.5), transparent 60%),
+    linear-gradient(180deg, #f9fafb 0%, #fefefe 60%, #ffffff 100%);
+  color: #111827;
   min-height: 100vh;
 }
 
@@ -47,7 +50,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #fb7185 0%, #f97316 40%, #facc15 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -217,7 +220,7 @@ body {
   margin-top: 1rem;
 }
 .home-hero-banner {
-  background: linear-gradient(135deg, #8b1d1d 0%, #b91c1c 60%, #ef4444 100%);
+  background: linear-gradient(135deg, #c5222a 0%, #e53935 60%, #f87171 100%);
   border-radius: 16px;
   padding: 2.5rem 1.5rem;
   color: #fff5f5;
@@ -228,6 +231,7 @@ body {
   font-size: 2rem;
   font-weight: 800;
   margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
 }
 .home-hero-sub {
   font-size: 1rem;
@@ -268,6 +272,15 @@ body {
   font-size: 0.95rem;
   color: #111827;
 }
+.home-field-from .home-field-icon {
+  color: #f472b6;
+}
+.home-field-to .home-field-icon {
+  color: #a78bfa;
+}
+.home-field-date .home-field-icon {
+  color: #60a5fa;
+}
 .home-pills {
   display: flex;
   gap: 0.5rem;
@@ -284,6 +297,10 @@ body {
 .pill.active {
   background: #fde68a;
   border-color: #f59e0b;
+}
+.pill.pill-secondary {
+  background: #e5e7eb;
+  color: #1f2937;
 }
 .home-toggle {
   display: flex;
@@ -327,7 +344,7 @@ input:checked + .slider:before {
 .home-search-btn {
   margin-top: 0.75rem;
   width: 100%;
-  background: #ef4444;
+  background: linear-gradient(180deg, #f43f5e 0%, #ef4444 100%);
   color: white;
   border: none;
   border-radius: 9999px;
@@ -335,6 +352,7 @@ input:checked + .slider:before {
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
+  box-shadow: 0 10px 20px rgba(244, 63, 94, 0.35);
 }
 .home-search-btn:hover {
   background: #dc2626;
@@ -388,9 +406,13 @@ input:checked + .slider:before {
   cursor: pointer;
 }
 .offer-tab-active {
-  background: #fee2e2;
-  border-color: #fecaca;
-  color: #b91c1c;
+  background: #f97373;
+  border-color: #fb7185;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(248, 113, 113, 0.35);
+}
+.offer-tab:hover {
+  background: #e5e7eb;
 }
 .offers-grid {
   display: grid;
@@ -434,9 +456,9 @@ input:checked + .slider:before {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.9);
   color: #111827;
-  border: 1px dashed #d1d5db;
+  border: 1px dashed rgba(248, 113, 113, 0.7);
   padding: 0.5rem 0.8rem;
   border-radius: 10px;
   font-weight: 800;
