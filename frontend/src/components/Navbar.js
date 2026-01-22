@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/global.css";
 
 function Navbar() {
@@ -16,24 +16,21 @@ function Navbar() {
     <nav className="navbar">
       <div className="nav-container">
         <Link to="/" className="nav-logo">
-          🚌 Bus Booking
+          🚌 Red Bus
         </Link>
         <div className="nav-links">
-          <NavLink to="/" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Home</NavLink>
-          <NavLink to="/buses" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Find Buses</NavLink>
-          <NavLink to="/dashboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Dashboard</NavLink>
+          <Link to="/" className="nav-link">Home</Link>
+          <Link to="/buses" className="nav-link">Buses</Link>
           {user ? (
             <>
-              <NavLink to="/mybookings" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>My Bookings</NavLink>
-              <div className="nav-user-wrapper">
-                <span className="nav-user">Hi, {user.name}</span>
-                <button onClick={handleLogout} className="btn-logout">Logout</button>
-              </div>
+              <Link to="/mybookings" className="nav-link">My Bookings</Link>
+              <span className="nav-user">Welcome, {user.name}</span>
+              <button onClick={handleLogout} className="btn-logout">Logout</button>
             </>
           ) : (
             <>
-              <NavLink to="/login" className="nav-link">Login</NavLink>
-              <Link to="/register" className="btn-register">Register</Link>
+              <Link to="/login" className="nav-link">Login</Link>
+              <Link to="/register" className="btn-primary btn-small">Register</Link>
             </>
           )}
         </div>

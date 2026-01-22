@@ -7,7 +7,7 @@ import BusList from "./pages/Buslist";
 import Booking from "./pages/Booking";
 import Payment from "./pages/Payment";
 import MyBookings from "./pages/MyBookings";
-import Dashboard from "./pages/Dashboard";
+
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/buses" element={<BusList />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+       
         <Route path="/book/:busId" element={<Booking />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/mybookings" element={<MyBookings />} />

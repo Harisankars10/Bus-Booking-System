@@ -1,32 +1,137 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/global.css";
 
 function Home() {
   const storedUser = localStorage.getItem("user");
   const user = storedUser ? JSON.parse(storedUser) : null;
+  const navigate = useNavigate();
+  const [source, setSource] = useState("");
+  const [destination, setDestination] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [womenOnly, setWomenOnly] = useState(false);
+
+  const setToday = () => setDate(new Date().toISOString().split("T")[0]);
+  const setTomorrow = () => {
+    const t = new Date();
+    t.setDate(t.getDate() + 1);
+    setDate(t.toISOString().split("T")[0]);
+  };
+
+  const handleSearch = () => {
+    navigate("/buses", { state: { source, destination, date, womenOnly } });
+  };
 
   return (
     <div className="container">
-      <section className="hero-section">
-        <h1 className="hero-title">
-          Travel with Comfort & Style
-        </h1>
-        <p className="hero-subtitle">
-          Book bus tickets instantly for thousands of routes across the country. 
-          Experience seamless travel with our premium bus partners.
-        </p>
-        
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <Link to="/buses" className="btn-primary" style={{ textDecoration: 'none', padding: '1rem 2rem', fontSize: '1.1rem' }}>
-            Find Buses 🚌
-          </Link>
-          {user && (
-            <Link to="/dashboard" className="btn-register" style={{ backgroundColor: '#475569', backgroundImage: 'none', padding: '1rem 2rem', fontSize: '1.1rem' }}>
-              View Dashboard 📊
-            </Link>
-          )}
+      <section className="home-hero">
+        <div className="home-hero-banner">
+          <h1 className="home-hero-title">India's No. 1 online bus ticket booking site</h1>
+          <p className="home-hero-sub">Book bus tickets instantly for thousands of routes across India.</p>
         </div>
+
+        <div className="home-search">
+          <div className="home-search-fields">
+            <div className="home-field">
+              <span className="home-field-icon">📍</span>
+              <input
+                type="text"
+                placeholder="From"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+              />
+            </div>
+            <div className="home-field">
+              <span className="home-field-icon">🎯</span>
+              <input
+                type="text"
+                placeholder="To"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+              />
+            </div>
+            <div className="home-field">
+              <span className="home-field-icon">📅</span>
+              <input type="date" value={date} min={new Date().toISOString().split("T")[0]} onChange={(e) => setDate(e.target.value)} />
+            </div>
+            <div className="home-pills">
+              <button className={`pill ${date === new Date().toISOString().split("T")[0] ? "active" : ""}`} onClick={setToday}>Today</button>
+              <button className="pill" onClick={setTomorrow}>Tomorrow</button>
+            </div>
+            <div className="home-toggle">
+              <span>Booking for women</span>
+              <label className="switch">
+                <input type="checkbox" checked={womenOnly} onChange={(e) => setWomenOnly(e.target.checked)} />
+                <span className="slider"></span>
+              </label>
+            </div>
+          </div>
+          <button className="home-search-btn" onClick={handleSearch}>Search buses</button>
+        </div>
+
+        <section className="home-section">
+          <div className="home-section-header">
+            <h2>Offers for you</h2>
+            <button className="home-section-link">View more</button>
+          </div>
+          <div className="offers-tabs">
+            <button className="offer-tab offer-tab-active">All</button>
+            <button className="offer-tab">Bus</button>
+            <button className="offer-tab">Train</button>
+          </div>
+          <div className="offers-grid">
+            <div className="offer-card offer-card-orange">
+              <span className="offer-tag">Bus</span>
+              <h3>Save up to ₹500 on bus tickets</h3>
+              <p>Valid till 27 Jan</p>
+              <div className="offer-footer">
+                <span className="offer-code">BHARAT500</span>
+              </div>
+            </div>
+            <div className="offer-card offer-card-gold">
+              <span className="offer-tag">Bus</span>
+              <h3>Save up to ₹300 on AP, Telangana routes</h3>
+              <p>Valid till 31 Jan</p>
+              <div className="offer-footer">
+                <span className="offer-code">SUPERHIT</span>
+              </div>
+            </div>
+            <div className="offer-card offer-card-peach">
+              <span className="offer-tag">Bus</span>
+              <h3>Save up to ₹300 on Karnataka, Tamil Nadu routes</h3>
+              <p>Valid till 31 Jan</p>
+              <div className="offer-footer">
+                <span className="offer-code">CASH300</span>
+              </div>
+            </div>
+            <div className="offer-card offer-card-pink">
+              <span className="offer-tag">Bus</span>
+              <h3>Save up to ₹500 with Axis Bank cards</h3>
+              <p>Valid till 31 Jan</p>
+              <div className="offer-footer">
+                <span className="offer-code">AXIS500</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="home-section">
+          <h2 className="home-section-title">What&apos;s new</h2>
+          <div className="whats-grid">
+            <div className="whats-card whats-card-blue">
+              <h3>Free Cancellation</h3>
+              <p>Get 100% refund on cancellation on select bus partners.</p>
+            </div>
+            <div className="whats-card whats-card-red">
+              <h3>Introducing Bus Timetable</h3>
+              <p>Check live bus timings and schedules in your state.</p>
+            </div>
+            <div className="whats-card whats-card-teal">
+              <h3>Flexi Ticket</h3>
+              <p>Enjoy free date change and easy rescheduling options.</p>
+            </div>
+          </div>
+        </section>
 
         <div className="features-grid">
           <div className="feature-card">
