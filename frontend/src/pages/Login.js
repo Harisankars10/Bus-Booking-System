@@ -31,6 +31,7 @@ function Login() {
     <div className="auth-container">
       <div className="auth-card">
         <h2>Login</h2>
+        <p className="auth-subtitle">Access your account to book buses and manage your trips.</p>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={loginUser}>
           <div className="form-group">
