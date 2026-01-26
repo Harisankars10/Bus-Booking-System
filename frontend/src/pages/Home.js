@@ -10,12 +10,31 @@ function Home() {
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [womenOnly, setWomenOnly] = useState(false);
+  const [activeTab, setActiveTab] = useState("buses");
+  const POPULAR_CITIES = [
+    { city: "Bangalore", state: "Karnataka" },
+    { city: "Hyderabad", state: "Telangana" },
+    { city: "Tirupati", state: "Andhra Pradesh" },
+    { city: "Coimbatore", state: "Tamil Nadu" },
+    { city: "Vijayawada", state: "Andhra Pradesh" },
+    { city: "Madurai", state: "Tamil Nadu" }
+  ];
+  const [showSrcSuggest, setShowSrcSuggest] = useState(false);
+  const [showDstSuggest, setShowDstSuggest] = useState(false);
 
   const setToday = () => setDate(new Date().toISOString().split("T")[0]);
   const setTomorrow = () => {
     const t = new Date();
     t.setDate(t.getDate() + 1);
     setDate(t.toISOString().split("T")[0]);
+  };
+
+  const swapFields = () => {
+    setSource((prev) => {
+      const s = destination;
+      setDestination(prev);
+      return s;
+    });
   };
 
   const handleSearch = () => {
@@ -31,32 +50,43 @@ function Home() {
         </div>
 
         <div className="home-search">
+          <div className="home-tabs">
+            <button className={`home-tab ${activeTab === 'buses' ? 'home-tab-active' : ''}`} onClick={() => setActiveTab('buses')}>🚌 Buses</button>
+            <button className="home-tab">✈️ Flights</button>
+            <button className="home-tab">🚆 Trains</button>
+            <button className="home-tab">🏨 Hotels</button>
+          </div>
           <div className="home-search-fields">
-            <div className="home-field">
+            <div className="home-field home-field-from">
               <span className="home-field-icon">📍</span>
               <input
                 type="text"
                 placeholder="From"
                 value={source}
+                onFocus={() => setShowSrcSuggest(true)}
+                onBlur={() => setTimeout(() => setShowSrcSuggest(false), 200)}
                 onChange={(e) => setSource(e.target.value)}
               />
             </div>
-            <div className="home-field">
+            <div className="home-field home-field-to">
               <span className="home-field-icon">🎯</span>
               <input
                 type="text"
                 placeholder="To"
                 value={destination}
+                onFocus={() => setShowDstSuggest(true)}
+                onBlur={() => setTimeout(() => setShowDstSuggest(false), 200)}
                 onChange={(e) => setDestination(e.target.value)}
               />
             </div>
-            <div className="home-field">
+            <button className="swap-btn" aria-label="Swap" onClick={swapFields}>↔</button>
+            <div className="home-field home-field-date">
               <span className="home-field-icon">📅</span>
               <input type="date" value={date} min={new Date().toISOString().split("T")[0]} onChange={(e) => setDate(e.target.value)} />
             </div>
             <div className="home-pills">
               <button className={`pill ${date === new Date().toISOString().split("T")[0] ? "active" : ""}`} onClick={setToday}>Today</button>
-              <button className="pill" onClick={setTomorrow}>Tomorrow</button>
+              <button className="pill pill-secondary" onClick={setTomorrow}>Tomorrow</button>
             </div>
             <div className="home-toggle">
               <span>Booking for women</span>
@@ -66,6 +96,28 @@ function Home() {
               </label>
             </div>
           </div>
+          {showSrcSuggest && (
+            <div className="suggest-panel">
+              <div className="suggest-title">Popular Cities</div>
+              {POPULAR_CITIES.map((c, i) => (
+                <button key={`src-${i}`} className="suggest-item" onMouseDown={() => setSource(c.city)}>
+                  <span className="suggest-main">{c.city}</span>
+                  <span className="suggest-sub">{c.state}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {showDstSuggest && (
+            <div className="suggest-panel">
+              <div className="suggest-title">Popular Cities</div>
+              {POPULAR_CITIES.map((c, i) => (
+                <button key={`dst-${i}`} className="suggest-item" onMouseDown={() => setDestination(c.city)}>
+                  <span className="suggest-main">{c.city}</span>
+                  <span className="suggest-sub">{c.state}</span>
+                </button>
+              ))}
+            </div>
+          )}
           <button className="home-search-btn" onClick={handleSearch}>Search buses</button>
         </div>
 

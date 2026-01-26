@@ -40,7 +40,8 @@ function BusList() {
   // Filters
   const [priceRange, setPriceRange] = useState([0, 3000]);
   const [selectedBusType, setSelectedBusType] = useState("all");
-  const [sortBy, setSortBy] = useState("price_low"); // price_low, price_high, time
+  const [sortBy, setSortBy] = useState("price_low"); // price_low, price_high, rating
+  const [departWindow, setDepartWindow] = useState("all");
 
   const navigate = useNavigate();
 
@@ -96,8 +97,30 @@ function BusList() {
     loadBuses({});
   };
 
+  const parseHour = (t) => {
+    if (!t || typeof t !== 'string') return null;
+    const m = t.match(/^(\d{1,2}):(\d{2})/);
+    if (!m) return null;
+    return parseInt(m[1], 10);
+  };
+  const inDepartWindow = (h) => {
+    if (h == null) return true;
+    if (departWindow === "all") return true;
+    if (departWindow === "before10") return h < 10;
+    if (departWindow === "between10_5") return h >= 10 && h < 17;
+    if (departWindow === "between5_11") return h >= 17 && h < 23;
+    if (departWindow === "after11") return h >= 23 || h < 3;
+    return true;
+  };
   const filteredBuses = useMemo(() => {
     return buses
+      .filter((bus) => bus.fare >= priceRange[0] && bus.fare <= priceRange[1])
+      .filter((bus) => {
+        if (selectedBusType === "all") return true;
+        const isAc = (bus.type || "").toLowerCase().includes("ac");
+        return selectedBusType === "ac" ? isAc : !isAc;
+      })
+      .filter((bus) => inDepartWindow(parseHour(bus.time)))
       .map((bus) => {
         let score = 0;
         if (searchSource) {
@@ -121,18 +144,18 @@ function BusList() {
         if (sortBy === "rating") return b.rating - a.rating;
         return 0;
       });
-  }, [buses, searchSource, searchDestination, sortBy]);
+  }, [buses, searchSource, searchDestination, sortBy, priceRange, selectedBusType, departWindow]);
 
   const displayedBuses = filteredBuses.length === 0 ? buses : filteredBuses;
 
-  const handleBook = (busId) => {
+  const handleBook = (busData) => {
     const user = localStorage.getItem("user");
     if (!user) {
       alert("Please login to book a bus");
       navigate("/login");
       return;
     }
-    navigate(`/book/${busId}`, { state: { travelDate } });
+    navigate(`/book/${busData.id}`, { state: { travelDate, bus: busData } });
   };
 
   if (loading) {
@@ -184,97 +207,88 @@ function BusList() {
       </div>
 
       <div className="main-content">
-        {/* Filters Sidebar */}
-        <aside className="filters-sidebar">
-          <div className="filter-section">
-            <h3>Filters</h3>
-            
-            <div className="filter-group">
-              <label>Bus Type</label>
-              <div className="radio-group">
-                <label>
-                  <input 
-                    type="radio" 
-                    name="busType" 
-                    checked={selectedBusType === "all"} 
-                    onChange={() => setSelectedBusType("all")} 
-                  /> All
-                </label>
-                <label>
-                  <input 
-                    type="radio" 
-                    name="busType" 
-                    checked={selectedBusType === "ac"} 
-                    onChange={() => setSelectedBusType("ac")} 
-                  /> AC
-                </label>
-                <label>
-                  <input 
-                    type="radio" 
-                    name="busType" 
-                    checked={selectedBusType === "non-ac"} 
-                    onChange={() => setSelectedBusType("non-ac")} 
-                  /> Non-AC
-                </label>
-              </div>
-            </div>
-
-            <div className="filter-group">
-              <label>Price Range (₹0 - ₹{priceRange[1]})</label>
-              <input 
-                type="range" 
-                min="0" 
-                max="3000" 
-                step="100"
-                value={priceRange[1]}
-                onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-              />
-            </div>
-
-            <div className="filter-group">
-              <label>Sort By</label>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="price_low">Cheapest First</option>
-                <option value="price_high">Expensive First</option>
-                <option value="rating">Highest Rated</option>
-              </select>
-            </div>
-          </div>
-        </aside>
-
-        {/* Bus List */}
-        <div className="bus-list-container">
-          <div className="results-header">
-            <h2>{displayedBuses.length} Buses found</h2>
+        <div className="route-summary-bar">
+          <div className="summary-left">
+            <h2>{displayedBuses.length} Buses</h2>
             <div className="active-route">
               {searchSource || "Anywhere"} <span className="arrow">→</span> {searchDestination || "Anywhere"}
             </div>
           </div>
-          
-          {/* Cities quick-pick */}
-          <div className="amenities-list" style={{ marginBottom: '0.5rem' }}>
-            {[...new Set(buses.map(b => b.source))].sort().map((city, i) => (
-              <span
-                key={`src-${city}-${i}`}
-                className="amenity-tag"
-                onClick={() => setSearchSource(city)}
-                style={{ cursor: 'pointer' }}
-              >
-                {city}
-              </span>
-            ))}
+          <div className="summary-right">
+            <span className="date-tag">{travelDate}</span>
           </div>
-          <div className="amenities-list" style={{ marginBottom: '1rem' }}>
-            {[...new Set(buses.map(b => b.destination))].sort().map((city, i) => (
-              <span
-                key={`dst-${city}-${i}`}
-                className="amenity-tag"
-                onClick={() => setSearchDestination(city)}
-                style={{ cursor: 'pointer' }}
-              >
-                {city}
-              </span>
-            ))}
+        </div>
+
+        <div className="filter-bar">
+          <div className="filter-inline">
+            <span className="filter-label">Bus Type</span>
+            <div className="time-chip-row">
+              <button className={`time-pill ${selectedBusType === "all" ? "active" : ""}`} onClick={() => setSelectedBusType("all")}>All</button>
+              <button className={`time-pill ${selectedBusType === "ac" ? "active" : ""}`} onClick={() => setSelectedBusType("ac")}>AC</button>
+              <button className={`time-pill ${selectedBusType === "non-ac" ? "active" : ""}`} onClick={() => setSelectedBusType("non-ac")}>Non-AC</button>
+            </div>
+          </div>
+
+          <div className="filter-inline">
+            <span className="filter-label">Price</span>
+            <input 
+              type="range" 
+              min="0" 
+              max="3000" 
+              step="100"
+              value={priceRange[1]}
+              onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
+            />
+            <span className="price-value">₹0 - ₹{priceRange[1]}</span>
+          </div>
+
+          <div className="filter-inline">
+            <span className="filter-label">Departure</span>
+            <div className="time-chip-row">
+              <button className={`time-pill ${departWindow === "before10" ? "active" : ""}`} onClick={() => setDepartWindow("before10")}>Before 10 AM</button>
+              <button className={`time-pill ${departWindow === "between10_5" ? "active" : ""}`} onClick={() => setDepartWindow("between10_5")}>10 AM - 5 PM</button>
+              <button className={`time-pill ${departWindow === "between5_11" ? "active" : ""}`} onClick={() => setDepartWindow("between5_11")}>5 PM - 11 PM</button>
+              <button className={`time-pill ${departWindow === "after11" ? "active" : ""}`} onClick={() => setDepartWindow("after11")}>After 11 PM</button>
+              <button className={`time-pill ${departWindow === "all" ? "active" : ""}`} onClick={() => setDepartWindow("all")}>All</button>
+            </div>
+          </div>
+
+          <div className="filter-inline">
+            <span className="filter-label">Sort</span>
+            <div className="sort-bar">
+              <button className={`sort-pill ${sortBy === "price_low" ? "active" : ""}`} onClick={() => setSortBy("price_low")}>Price ↓</button>
+              <button className={`sort-pill ${sortBy === "price_high" ? "active" : ""}`} onClick={() => setSortBy("price_high")}>Price ↑</button>
+              <button className={`sort-pill ${sortBy === "rating" ? "active" : ""}`} onClick={() => setSortBy("rating")}>Ratings ↑</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="bus-list-container">
+          <div className="cities-quick">
+            <div className="amenities-list" style={{ marginBottom: '0.5rem' }}>
+              {[...new Set(buses.map(b => b.source))].sort().map((city, i) => (
+                <span
+                  key={`src-${city}-${i}`}
+                  className="amenity-tag"
+                  onClick={() => setSearchSource(city)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {city}
+                </span>
+              ))}
+            </div>
+            <div className="amenities-list" style={{ marginBottom: '1rem' }}>
+              {[...new Set(buses.map(b => b.destination))].sort().map((city, i) => (
+                <span
+                  key={`dst-${city}-${i}`}
+                  className="amenity-tag"
+                  onClick={() => setSearchDestination(city)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {city}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div className="buses-wrapper">
@@ -323,7 +337,7 @@ function BusList() {
                   <div className="seats-left">
                     {bus.available_seats ?? (bus.total_seats - (bus.booked_seats || 0))} Seats left
                   </div>
-                  <button onClick={() => handleBook(bus.id)} className="book-btn">
+                  <button onClick={() => handleBook(bus)} className="book-btn">
                     Select Seat
                   </button>
                 </div>

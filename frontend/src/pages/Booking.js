@@ -8,6 +8,7 @@ function Booking() {
   const navigate = useNavigate();
   const location = useLocation();
   const travelDate = location.state?.travelDate || new Date().toISOString().split('T')[0];
+  const initialBusFromState = location.state?.bus || null;
   const [bus, setBus] = useState(null);
   const [seats, setSeats] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,15 @@ function Booking() {
       navigate("/login");
       return;
     }
-    loadBus();
+    if (initialBusFromState) {
+      setBus({
+        available_seats: initialBusFromState.available_seats ?? (initialBusFromState.total_seats || 40),
+        ...initialBusFromState
+      });
+      setLoading(false);
+    } else {
+      loadBus();
+    }
   }, [busId, navigate]);
 
   const loadBus = async () => {
